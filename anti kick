@@ -1,0 +1,122 @@
+// ==UserScript==
+// @name          Auto Left and Join with kick - SEIF DZ EDITION
+// @description   الحماية الاحترافية من الطرد - تطوير Seif dz
+// @version       3.0
+// @author        Seif dz
+// @match         *://gartic.io/*
+// @match         *://*.gartic.io/*
+// @grant         GM_addStyle
+// @grant         none
+// @run-at        document-idle
+// ==/UserScript==
+
+(function() {
+    'use strict';
+
+    let originalSend = WebSocket.prototype.send;
+    let setTrue = false;
+    let isImageClicked = true;
+    let canScanChat = false; 
+
+    window.wsObj = {};
+
+    // وظيفة بدء مراقبة الشات بعد فترة أمان (بصمة Seif dz)
+    function startChatGracePeriod() {
+        canScanChat = false;
+        console.log("⏳ [Seif dz] نظام الحماية في وضع الاستعداد...");
+        setTimeout(() => {
+            canScanChat = true;
+            console.log("✅ [Seif dz] نظام الحماية مفعل الآن ومستعد للكشف");
+        }, 3000); 
+    }
+
+    WebSocket.prototype.send = function(data) {
+        originalSend.apply(this, arguments);
+        if (Object.keys(window.wsObj).length == 0) {
+            window.wsObj = this;
+            window.eventAdd();
+        }
+    };
+
+    window.eventAdd = () => {
+        if (!setTrue) {
+            setTrue = 1;
+            window.wsObj.addEventListener("message", (msg) => {
+                try {
+                    let data = JSON.parse(msg.data.slice(2));
+                    if (data[0] == 5) {
+                        window.wsObj.lengthID = data[1];
+                        window.wsObj.id = data[2];
+                        window.wsObj.roomCode = data[3];
+                        startChatGracePeriod(); 
+                    }
+
+                    if (data[0] == 45) {
+                        window.wsObj.long = data[2];
+                        if (window.wsObj.long === window.wsObj.lengthID && isImageClicked) {
+                            triggerSeifButton();
+                        }
+                    }
+                } catch(e) {}
+            });
+        }
+    };
+
+    function triggerSeifButton() {
+        let seifBtn = document.getElementById('seif-quick-exit');
+        if (seifBtn) {
+            console.log("🚨 [Seif dz] تم كشف طرد! تفعيل الخروج السريع...");
+            seifBtn.click();
+        } else {
+            manualExit();
+        }
+    }
+
+    function manualExit() {
+        let exitButton = document.querySelector('#exit') || document.querySelector('.bt-exit');
+        if (exitButton) {
+            exitButton.click();
+            setTimeout(() => { window.location.reload(); }, 600);
+        } else {
+            window.location.reload();
+        }
+    }
+
+    GM_addStyle(`#seif-protection-toggle { position: fixed; top: 10px; left: 10px; z-index: 999999; cursor: pointer; width: 28px; height: 28px; background: white; border-radius: 50%; padding: 3px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); } #seif-protection-toggle img { width: 100%; height: 100%; display: block; }`);
+    let togglePanel = document.createElement('div'); togglePanel.id = 'seif-protection-toggle';
+    let img = document.createElement('img'); let images = ['data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="black"/><path d="M7 12l4 4 6-7" stroke="cyan" stroke-width="3" fill="none" stroke-linecap="round"/></svg>', 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="black" stroke="black" stroke-width="2"/><line x1="6" y1="6" x2="18" y2="18" stroke="red" stroke-width="3"/><line x1="18" y1="6" x2="6" y2="18" stroke="red" stroke-width="3"/></svg>'];
+    img.src = images[0]; img.onclick = function() { isImageClicked = !isImageClicked; this.src = isImageClicked ? images[0] : images[1]; console.log("🛡️ [Seif dz] الحماية:", isImageClicked ? "مفعلة" : "معطلة"); };
+    togglePanel.appendChild(img); document.body ? document.body.appendChild(togglePanel) : window.addEventListener('DOMContentLoaded', () => document.body.appendChild(togglePanel));
+
+    let ready = 0;
+    function _(x) { return document.querySelector(x); };
+    function _a(x) { return document.querySelectorAll(x); };
+
+    let interval = setInterval(() => {
+        if (_(".game")) {
+            if (ready == 0) {
+                setTimeout(() => { 
+                    console.log("👑 [Seif dz] السكربت جاهز للعمل");
+                    ready = 1; 
+                }, 300);
+            }
+
+            if (_(".contentPopup")) { _(".btYellowBig.ic-yes")?.click(); }
+
+            if (ready == 1 && canScanChat) { 
+                let chatMessages = _a(".scrollElements")[2]?.querySelectorAll(".msg.alert");
+                if (chatMessages) {
+                    for (let i of chatMessages) {
+                        let yourName = _(".user.you")?.innerText?.split("\n")[0];
+                        if (yourName && i.innerText.includes(yourName) && i.innerText.includes("kicked")) {
+                            triggerSeifButton();
+                            canScanChat = false; 
+                        }
+                    }
+                }
+            }
+        }
+    }, 100);
+
+})();
+
